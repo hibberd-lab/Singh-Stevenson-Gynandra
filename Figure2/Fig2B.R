@@ -1,7 +1,7 @@
 library(ggplot2)
 library(tidyverse)
 
-data <- read_tsv("GO_terms_stackedbar_data.txt", 
+data <- read_tsv("Fig2B_GO_term_data.txt", 
                  col_names = c("GO_Term", "Frequency", "Time_Point", "Direction"))
 data$Time_Point <- as.factor(data$Time_Point)
 data$Time_Point <- ordered(data$Time_Point, levels = c("0.5", "2", "4", "24"))
