@@ -12,7 +12,7 @@ col_breaks <- c(seq(-1,-0.1,length=100), seq(-0.09,0.1,length=100), seq(0.11,0.5
 
 svg(filename = "Fig2C_heatmap.svg", height = 10, width = 5, pointsize = 20)
 
-heatmap.2(df_matrix, Colv = F, col = viridis, RowSideColors = c(rep("grey", 91), 
+heatmap.2(df_matrix, Colv = F, col = viridis, RowSideColors = c(rep("grey", 87), 
                                                                 rep("black", 28)), 
           dendrogram = "row", trace = "none", symkey = F, scale = "none", 
           cexRow = 0.4, key = T, key.title = NA, keysize = 1, 
