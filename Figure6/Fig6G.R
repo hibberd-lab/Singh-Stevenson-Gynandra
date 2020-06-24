@@ -5,7 +5,7 @@ library(viridis)
 library(plyr)
 library(data.table)
 
-data <- read_tsv("Motif_Cluster_Proportion_Data2", col_names = T)
+data <- read_tsv("Motif_Cluster_Proportion_Data", col_names = T)
 
 data_pivot <- pivot_longer(data, cols = ends_with("hr"), names_to = "TimeCourse", values_to = "Freq", values_drop_na = T)
 
