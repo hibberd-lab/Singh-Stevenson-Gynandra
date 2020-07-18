@@ -3,7 +3,7 @@
 2. /${PATH_TO}/salmon index -t ${Ggynandra_transcriptome.fasta} -i ${Ggynandra_index}
 3. /${PATH_TO}/salmon quant -i ${Ggynandra_index} -l A -r ${SAMPLE.fastq} -p ${THREADS} -o quants/${SAMPLE}
 
-#Identification of G. gynandra transcription facrtors
+#Identification of G. gynandra transcription factors
 1. blastp -num_threads 6 -query PlnTFDB_PEP_1091391013.fasta -db ${Ggy_protein_DB} -outfmt 6 -evalue 1e-40 | cut -f2 | sort | uniq > Ggy_potential_TFs.txt
 
 #DNase-SEQ read processing
