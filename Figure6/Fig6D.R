@@ -2,7 +2,7 @@ library(tidyverse)
 library(gplots)
 library(viridis)
 
-df <- read_tsv("Fig6")
+df <- read_tsv("Fig6A-D_Data")
 
 df <- filter(df, GgC4 < 51)
 df_matrix <- as.matrix(df[,-1])
