@@ -33,7 +33,6 @@ if [ ! -f ./${NAME}_peaks/${NAME}_DHS_TSS_distance.txt ]; then awk '{OFS="\t"; m
 if [ ! -f ./${NAME}_peaks/${NAME}_SPOT ]; then
 awk 'BEGIN{OFS="\t"};{print $1, $2, $3'} ./${NAME}_peaks/${NAME}.MACS_peaks.narrowPeak > ./${NAME}_peaks/${NAME}_OUTBED;
 zcat ./${NAME}_peaks/${NAME}_pooled.tagAlign.gz | shuf | head -n 5000000 - > ./${NAME}_peaks/${NAME}_T_BEDFILE;
-#shuf ./${NAME}_peaks/${NAME}_pooled.tagAlign | head -n 5000000 - > ./${NAME}_peaks/${NAME}_T_BEDFILE
 SPT=`bedtools intersect -f 1E-9 -wa -u -a ./${NAME}_peaks/*_T_BEDFILE -b ./${NAME}_peaks/*_OUTBED -bed | wc -l`;
 if [ $? -eq 0 ]; then rm ./${NAME}_peaks/*_T_BEDFILE; rm ./${NAME}_peaks/*_OUTBED; else echo "SPOT score failed - moving on but look to repeat this step"; fi;
 echo "scale=2; ${SPT}/5000000" | bc > ./${NAME}_peaks/${NAME}_SPOT;
