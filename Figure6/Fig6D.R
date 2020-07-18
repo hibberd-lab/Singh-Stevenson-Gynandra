@@ -2,11 +2,11 @@ library(tidyverse)
 library(gplots)
 library(viridis)
 
-df <- read_tsv("Fig6D_motif_rank_data.txt", col_names = c("Motif","AtC3", "GgC3", "AtC4", "GgC4"))
+df <- read_tsv("Fig6")
 
+df <- filter(df, GgC4 < 51)
 df_matrix <- as.matrix(df[,-1])
-
-rownames(df_matrix) <- df$Motif
+rownames(df_matrix) <- df$MOTIF
 
 col_breaks <- c(seq(1,50,length=300), seq(51,300,length=300), seq(301,841, length=300))
 
