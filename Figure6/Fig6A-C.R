@@ -1,6 +1,6 @@
 library(ggplot2)
 library(tidyverse)
-data <- read_tsv("Fig6_Data")
+data <- read_tsv("Fig6A-D_Data")
 
 #6A plot
 data_a <- select(data, -c(MOTIF, AtC4))
