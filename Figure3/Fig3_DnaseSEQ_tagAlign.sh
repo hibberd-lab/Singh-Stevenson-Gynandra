@@ -6,6 +6,7 @@
 bam_in=$1
 threads=$2
 genome_fa=$3
+picard_path=$4
 
 echo ${bam_in} 
 echo ${threads}
@@ -20,18 +21,18 @@ if [ ! -f ${bam_in}_filt ]; then
 
 	if [ ! -f ${bam_in}_srt.bai ]; then samtools index ${bam_in}_srt; fi
 
-	if [ ! -f ${bam_in}_no_dup ]; then java -jar /home/srs62/Documents/programs/picard.jar MarkDuplicates ASSUME_SORTED=true REMOVE_DUPLICATES=true I=${bam_in}_srt O=${bam_in}_no_dup M=${bam_in%.bam}_marked_dup_metrics.txt 2>> ${bam_in%.bam}_log.txt; fi
+	if [ ! -f ${bam_in}_no_dup ]; then java -jar ${picard_path}/picard.jar MarkDuplicates ASSUME_SORTED=true REMOVE_DUPLICATES=true I=${bam_in}_srt O=${bam_in}_no_dup M=${bam_in%.bam}_marked_dup_metrics.txt 2>> ${bam_in%.bam}_log.txt; fi
 
 	samtools sort -@ ${threads} -n ${bam_in}_no_dup | samtools fixmate -r -O bam - - | samtools view -F 1804 -f 2 -@ ${threads} -O BAM -u - | samtools sort -o ${bam_in}_filt - 2>> ${bam_in%.bam}_log.txt; fi
 	if [ $? -eq 0 ]; then rm ${bam_in}_srt*; rm ${bam_in}_no_dup*; else echo "Bam processing steps likely failed"; FAIL; fi
 
 if [ ! -f ${bam_in}_filt.bai ]; then samtools index ${bam_in}_filt; fi
 
-if [ ! -f ${bam_in%.bam}_lib_complex_metrics.txt ]; then java -jar /home/srs62/Documents/programs/picard.jar EstimateLibraryComplexity I=${bam_in}_filt O=${bam_in%.bam}_lib_complex_metrics.txt 2>> ${bam_in%.bam}_log.txt; fi &
+if [ ! -f ${bam_in%.bam}_lib_complex_metrics.txt ]; then java -jar ${picard_path}/picard.jar EstimateLibraryComplexity I=${bam_in}_filt O=${bam_in%.bam}_lib_complex_metrics.txt 2>> ${bam_in%.bam}_log.txt; fi &
 
-if [ ! -f ${bam_in%.bam}_gc_bias_metrics.pdf ]; then java -jar /home/srs62/Documents/programs/picard.jar CollectGcBiasMetrics I=${bam_in}_filt O=${bam_in%.bam}_gc_bias_metrics.txt CHART=${bam_in%.bam}_gc_bias_metrics.pdf S=${bam_in%.bam}_summary_metrics.txt R=${genome_fa} 2>> ${bam_in%.bam}_log.txt; fi &
+if [ ! -f ${bam_in%.bam}_gc_bias_metrics.pdf ]; then java -jar ${picard_path}/picard.jar CollectGcBiasMetrics I=${bam_in}_filt O=${bam_in%.bam}_gc_bias_metrics.txt CHART=${bam_in%.bam}_gc_bias_metrics.pdf S=${bam_in%.bam}_summary_metrics.txt R=${genome_fa} 2>> ${bam_in%.bam}_log.txt; fi &
 
-if [ ! -f ${bam_in%.bam}.window500.hist_data ]; then java -jar /home/srs62/Documents/programs/picard.jar CollectInsertSizeMetrics I=${bam_in}_filt O="${bam_in%.bam}.window500.hist_data" H="${bam_in%.bam}.window500.hist_graph.pdf" W=500 2>> ${bam_in%.bam}_log.txt; fi &
+if [ ! -f ${bam_in%.bam}.window500.hist_data ]; then java -jar ${picard_path}/picard.jar CollectInsertSizeMetrics I=${bam_in}_filt O="${bam_in%.bam}.window500.hist_data" H="${bam_in%.bam}.window500.hist_graph.pdf" W=500 2>> ${bam_in%.bam}_log.txt; fi &
 
 threads_n=$(( ${threads} - 3 ))
 if [ ! -f ${bam_in%.bam}.tagAlign.gz ]; then samtools sort -@ ${threads_n} -n -O BAM ${bam_in}_filt | bamToBed -i stdin -bedpe | awk 'BEGIN{FS="\t";OFS="\t"}{print $1,$2,$6,"N",$8,$9}' | gzip > ${bam_in%.bam}.tagAlign.gz 2>> ${bam_in%.bam}_log.txt; fi
