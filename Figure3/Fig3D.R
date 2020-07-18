@@ -2,7 +2,8 @@ library(tidyverse)
 library(ggplot2)
 library(reshape2)
 
-df <- read_tsv("Fig3D_dDHS_data.txt", col_names = c("DHS", "30min_change", "2H_change", "4H_change", "24H_change", "Class"))
+df <- read_tsv("Fig3D_dDHS_data.txt", col_names = c("DHS", "30min_change", "2H_change", "4H_change", "24H_change", "Class", "ID"))
+df <- select(df, -ID)
 
 data_m <- gather(df, key = "Time", value = "dDHS", -DHS, -Class)
 data_m$Time <- factor(data_m$Time, levels = c("30min_change", "2H_change","4H_change", "24H_change"))
