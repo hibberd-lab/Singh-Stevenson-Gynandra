@@ -6,7 +6,7 @@
 #Identification of G. gynandra transcription factors
 1. blastp -num_threads 6 -query PlnTFDB_PEP_1091391013.fasta -db ${Ggy_protein_DB} -outfmt 6 -evalue 1e-40 | cut -f2 | sort | uniq > Ggy_potential_TFs.txt
 
-#DNase-SEQ read processing
+#DNase-SEQ read mapping
 1. java -jar /${PATH_TO}/trimmomatic-0.36.jar PE ${SAMPLE_R1).fastq.gz  ${SAMPLE_R2}.fastq.gz -baseout ${SAMPLE} ILLUMINACLIP:/${PATH_TO}/TruSeq3-PE-2.fa:2:30:10 HEADCROP:3 CROP:70 LEADING:30 TRAILING:30 SLIDINGWINDOW:10:28 MINLEN:35
 2. bowtie2 -p ${THREADS} --local -q -x ${PREFIX} -1 ${R1} -2 ${R2}
 
@@ -15,15 +15,9 @@
 2. for f in ./{TIME_POINT}/{TIME_POINT}_peaks.narrowPeak; do bedtools intersect -wa -a ${f} -b ${GENE_LIST}_gene_regions.bed; done | sort -k1,1 -k2,2n | cut -f1,2,3 | bedtools merge -i stdin > ${GENE_LIST}_DHS_merged.bed
 3. dnase_ddhs_scorer.py ${GENE_LIST}_DHS_merged.bed ${GENE_LIST}_DHS_merged.bed ${GENE_LIST}_DHS_merged.bed ./PATHTOBAM/{SAMPLEB}.bam ./PATHTOBAM/{SAMPLEA}.bam {OUTPUT}
 
-#Analysis of motif occurences across DHS regions
+#Analysis of motif occurences across DHS regions of C3 and C4 regions of G. gynandra and Arabidopsis
 1. grep -f ${GENE_LIST} ${Ggy_lifted_mRNA.bed} | cut -f1,2,3,4,6 | awk '($5=="+") {OFS="\t"; print $1, $2-1000, $2, $4} ($5=="-") {OFS="\t"; print $1, $3, $3+1000, $4}' > ${GENE_LIST}_gene_regions.bed
 2. for f in ./*peaks/*peaks.narrowPeak; do bedtools intersect -wa -a ${f} -b ${GENE_LIST}_gene_regions.bed; done | sort -k1,1 -k2,2n | cut -f1,2,3 | bedtools merge -i stdin | bedtools getfasta -fi ${Ggynandra_genome.fa} -bed stdin -fo ${GENE_LIST}_DHS.fa
 3. fasta-get-markov -m 1 ${GENE_LIST}_DHS.fa ${GENE_LIST}.bg
 4. fimo -o ${GENE_LIST}_fimo --verbosity 1 --bgfile ${GENE_LIST}.bg ${DAPseq_PBM.meme} ${GENE_LIST}_DHS.fa
 5. awk '{OFS="\t"; print $1, $2, $9}' ${GENE_LIST}_fimo/fimo.txt | sort -k1,1 -k2,2 -k3,3 | uniq | cut -f1 | sort | uniq -c | awk '!/#/ {total+=$1; OFS="\t"; print $2, $1} END {print "total", total}' > ${GENE_LIST}_fimo_motif_frequencies_total_freq
-
-#Generation of phylogeny for homeodomain proteins
-1. ete3 -w clustalo_default-trimal02-none-raxml_default -C 2 -a homeodomain_protein.fa -o homeodomain_protein_tree
-
-#Counting of light/chloroplastic regualting elements frequencies in gene loci (example shown for the GATA factors binding sites)
-1. for f in Cg*/fimo.txt; do grep -E "GATC[TC]|[AG]GATC" ${f} | awk '{OFS="\t"; split($2, a, ":"); split(a[2], b, "-"); print a[1], b[1]+$3, b[1]+$4}' | sort -k1,1 -k2,2n | bedtools merge -i stdin; done | wc -l
