@@ -21,3 +21,10 @@
 3. fasta-get-markov -m 1 ${GENE_LIST}_DHS.fa ${GENE_LIST}.bg
 4. fimo -o ${GENE_LIST}_fimo --verbosity 1 --bgfile ${GENE_LIST}.bg ${DAPseq_PBM.meme} ${GENE_LIST}_DHS.fa
 5. awk '{OFS="\t"; print $1, $2, $9}' ${GENE_LIST}_fimo/fimo.txt | sort -k1,1 -k2,2 -k3,3 | uniq | cut -f1 | sort | uniq -c | awk '!/#/ {total+=$1; OFS="\t"; print $2, $1} END {print "total", total}' > ${GENE_LIST}_fimo_motif_frequencies_total_freq
+
+#Analysis of read depth around TSS
+# For each light sample (0.5, 2, 4 and 24H) we compare the read depth to the 0H/Dark sample
+1. bamCompare -b1 ${light_sample}.bam -b2 0m.bam -o ${light_sample}_vs_0m_log2.bw --binSize 20 -p 6
+2. bigWigToWig ${light_sample}_vs_0m_log2.bw ${light_sample}_vs_0m_log2.wig
+3. grep -v -E "#" ${light_sample}_vs_0m_log2.wig | bedtools intersect -wa -wb -a 4kbp_around_TSS -b stdin | awk '($5=="-") {OFS="\t"; print $2-$8+2000, $9} ($5=="+") {OFS="\t"; print $8-$2-2000, $9}' > Position_log2_4kbp_${light_sample}_0H
+# these final files are used for plotting in the script Fig3C.R
