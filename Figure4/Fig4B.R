@@ -4,7 +4,7 @@ library(gridExtra)
 library(gplots)
 library(viridis)
 
-data_raw <- read_tsv("Fig4B_data.txt")
+data_raw <- read_tsv("Fig4BC_data.txt")
 ######################################################################
 
 theme_set(theme_bw())
